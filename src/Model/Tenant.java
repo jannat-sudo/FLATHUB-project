@@ -1,9 +1,10 @@
+package Model;
+
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.Period;
 
 public class Tenant extends Person implements Serializable{
-    private static final long serialVersionUID=1L;
     private String flat_no;
     private double rent;
     private double dues;
@@ -60,13 +61,14 @@ public class Tenant extends Person implements Serializable{
                    duration+="years:"+p.getYears();
         }
         if(p.getMonths()>0){
-            duration+="months:"+p.getMonths();
+            duration=duration+"months:"+p.getMonths();
         }
         if(p.getDays()>0){
-            duration+="days:"+p.getDays();
+            duration=duration+"days:"+p.getDays();
         }
         return duration;
     }
+
     public void setFlat_no(String flat_no) {
         this.flat_no = flat_no;
     }
@@ -87,9 +89,10 @@ public class Tenant extends Person implements Serializable{
         Active = active;
     }
 
+
     @Override
     public String toString() {
-        return "Tenant{" +
+        return "Model.Tenant{" +
                 "flat_no='" + flat_no + '\'' +
                 ", rent=" + rent +
                 ", dues=" + dues +

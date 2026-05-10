@@ -1,3 +1,8 @@
+package View;
+import Model.*;
+import Controller.*;
+
+
 public class main {
    static File_handler FH=new File_handler();
     public static void main(String[] args){
