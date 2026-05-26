@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.Period;
 
-public class Tenant extends Person implements Serializable{
+public class Tenant extends Person implements Serializable {
     private String flat_no;
     private double rent;
     private double dues;
@@ -13,16 +13,16 @@ public class Tenant extends Person implements Serializable{
     private boolean Active;
 
     public Tenant() {
+        super();
     }
-
-    public Tenant(String name,String cnic,String phone,String flat_no,double rent,double dues,String type,String JoinDate,boolean Active) {
-       super();
+    public Tenant(String name, String cnic, String phone, String flat_no, double rent, double dues, String type, String JoinDate, boolean Active) {
+        super(name,cnic,phone);
         this.flat_no = flat_no;
-        this.rent=rent;
-        this.dues=dues;
-        this.type=type;
-        this.JoinDate=JoinDate;
-        this.Active=Active;
+        this.rent = rent;
+        this.dues = dues;
+        this.type = type;
+        this.JoinDate = JoinDate;
+        this.Active = Active;
     }
 
     public String getFlat_no() {
@@ -52,19 +52,20 @@ public class Tenant extends Person implements Serializable{
     public void setDues(double dues) {
         this.dues = dues;
     }
+
     public String time_Duration() {
         LocalDate start = LocalDate.parse(JoinDate);
         LocalDate Stop = LocalDate.now();
         Period p = Period.between(start, Stop);
         String duration = "";
         if (p.getYears() > 0) {
-                   duration+="years:"+p.getYears();
+            duration += "years:" + p.getYears();
         }
-        if(p.getMonths()>0){
-            duration=duration+"months:"+p.getMonths();
+        if (p.getMonths() > 0) {
+            duration = duration + "months:" + p.getMonths();
         }
-        if(p.getDays()>0){
-            duration=duration+"days:"+p.getDays();
+        if (p.getDays() > 0) {
+            duration = duration + "days:" + p.getDays();
         }
         return duration;
     }
@@ -100,13 +101,7 @@ public class Tenant extends Person implements Serializable{
                 ", JoinDate='" + JoinDate + '\'' +
                 ", Active=" + Active +
                 '}';
+
     }
-
-
-
-
-
-
-
 
 }

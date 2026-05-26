@@ -3,7 +3,6 @@ package Model;
 import java.io.Serializable;
 
 public class Person implements Serializable {
-
     private String name;
     private String cnic;
     private String phone_no;
@@ -22,11 +21,11 @@ public class Person implements Serializable {
         return name;
     }
 
-    public String getcnic() {
+    public String getCnic() {
         return cnic;
     }
 
- public String getPhone_no() {
+    public String getPhone_no() {
         return phone_no;
     }
 
@@ -41,6 +40,7 @@ public class Person implements Serializable {
     public void setPhone_no(String phone_no) {
         this.phone_no = phone_no;
     }
+
 }
 
 
