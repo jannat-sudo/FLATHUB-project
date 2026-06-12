@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FlatHub - Flat Management System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #1a1a2e;
+            --bg-secondary: #16213e;
+            --bg-card: #0f3460;
+            --bg-hover: #1a4a7a;
+            --text-primary: #e8e8e8;
+            --text-secondary: #a0a0b0;
+            --accent-pink: #ff6b9d;
+            --accent-purple: #c084fc;
+            --accent-blue: #60a5fa;
+            --accent-cyan: #22d3ee;
+            --accent-green: #34d399;
+            --accent-orange: #fb923c;
+            --accent-red: #f87171;
+            --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --gradient-3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --shadow: 0 10px 40px rgba(0,0,0,0.3);
+            --shadow-lg: 0 20px 60px rgba(0,0,0,0.4);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Poppins', sans-serif; background: var(--bg-primary); color: var(--text-primary); overflow-x: hidden; }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-secondary); }
+        ::-webkit-scrollbar-thumb { background: var(--accent-purple); border-radius: 4px; }
+
+        /* Login Page */
+        .login-container {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg-primary);
+            display: flex; justify-content: center; align-items: center; z-index: 1000;
+        }
+        .login-box {
+            background: var(--bg-secondary); padding: 50px; border-radius: 24px;
+            box-shadow: var(--shadow-lg); width: 100%; max-width: 420px; text-align: center;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .login-icon { font-size: 60px; color: var(--accent-purple); margin-bottom: 20px; }
+        .login-box h1 { color: var(--text-primary); font-size: 32px; margin-bottom: 8px; font-weight: 700; }
+        .login-box p { color: var(--text-secondary); margin-bottom: 35px; font-size: 14px; }
+        .login-input {
+            width: 100%; padding: 14px 18px; margin-bottom: 18px;
+            background: var(--bg-primary); border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 12px; color: var(--text-primary); font-size: 15px;
+            transition: all 0.3s;
+        }
+        .login-input:focus { outline: none; border-color: var(--accent-purple); box-shadow: 0 0 20px rgba(192,132,252,0.2); }
+        .login-btn {
+            width: 100%; padding: 14px; background: var(--gradient-1); color: white;
+            border: none; border-radius: 12px; font-size: 16px; font-weight: 600;
+            cursor: pointer; transition: all 0.3s; text-transform: uppercase; letter-spacing: 1px;
+        }
+        .login-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(102,126,234,0.4); }
+        .login-error { color: var(--accent-red); margin-top: 12px; font-size: 13px; min-height: 20px; }
+
+        /* Dashboard */
+        .dashboard { display: none; min-height: 100vh; }
+        .dashboard.active { display: flex; }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px; background: var(--bg-secondary); height: 100vh;
+            position: fixed; display: flex; flex-direction: column; z-index: 100;
+            border-right: 1px solid rgba(255,255,255,0.05);
+        }
+        .sidebar-header {
+            padding: 30px 25px; border-bottom: 1px solid rgba(255,255,255,0.05);
+            display: flex; align-items: center; gap: 15px;
+        }
+        .sidebar-header i { font-size: 32px; color: var(--accent-purple); }
+        .sidebar-header h2 { color: white; font-size: 24px; font-weight: 700; }
+        .sidebar-nav { flex: 1; padding: 20px 0; }
+        .nav-item {
+            display: flex; align-items: center; gap: 15px; padding: 16px 25px;
+            cursor: pointer; transition: all 0.3s; border-left: 3px solid transparent;
+            color: var(--text-secondary); text-decoration: none;
+        }
+        .nav-item:hover { background: rgba(255,255,255,0.03); color: white; }
+        .nav-item.active {
+            background: linear-gradient(90deg, rgba(102,126,234,0.15) 0%, transparent 100%);
+            color: var(--accent-purple); border-left-color: var(--accent-purple);
+        }
+        .nav-item i { font-size: 20px; width: 24px; text-align: center; }
+        .nav-item span { font-size: 15px; font-weight: 500; }
+        .sidebar-footer { padding: 20px 25px; border-top: 1px solid rgba(255,255,255,0.05); }
+        .logout-btn {
+            width: 100%; padding: 12px; background: rgba(248,113,113,0.1); color: var(--accent-red);
+            border: 1px solid rgba(248,113,113,0.2); border-radius: 10px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            font-weight: 500; transition: all 0.3s;
+        }
+        .logout-btn:hover { background: rgba(248,113,113,0.2); }
+
+        /* Main Content */
+        .main-content { flex: 1; margin-left: 280px; min-height: 100vh; }
+        .top-bar {
+            background: var(--bg-secondary); padding: 20px 35px;
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.05); position: sticky; top: 0; z-index: 50;
+        }
+        .top-bar h2 { font-size: 24px; font-weight: 600; color: white; }
+        .user-info { display: flex; align-items: center; gap: 12px; }
+        .user-info span { color: var(--text-secondary); font-weight: 500; }
+        .user-avatar {
+            width: 40px; height: 40px; border-radius: 50%;
+            background: var(--gradient-1); display: flex; align-items: center;
+            justify-content: center; color: white; font-weight: 600;
+        }
+        .content { padding: 35px; }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px; margin-bottom: 35px;
+        }
+        .stat-card {
+            background: var(--bg-secondary); padding: 30px; border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center;
+            gap: 20px; transition: all 0.3s; position: relative; overflow: hidden;
+        }
+        .stat-card::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 3px;
+            background: var(--gradient-1); opacity: 0; transition: opacity 0.3s;
+        }
+        .stat-card:hover::before { opacity: 1; }
+        .stat-card:hover { transform: translateY(-5px); box-shadow: var(--shadow); }
+        .stat-icon {
+            width: 60px; height: 60px; border-radius: 14px; display: flex;
+            align-items: center; justify-content: center; font-size: 24px;
+        }
+        .stat-icon.pink { background: rgba(255,107,157,0.15); color: var(--accent-pink); }
+        .stat-icon.cyan { background: rgba(34,211,238,0.15); color: var(--accent-cyan); }
+        .stat-icon.green { background: rgba(52,211,153,0.15); color: var(--accent-green); }
+        .stat-icon.orange { background: rgba(251,146,60,0.15); color: var(--accent-orange); }
+        .stat-info h3 { font-size: 32px; font-weight: 700; color: white; }
+        .stat-info p { color: var(--text-secondary); font-size: 14px; margin-top: 4px; }
+
+        /* Tables */
+        .table-container {
+            background: var(--bg-secondary); border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.05); overflow: hidden;
+        }
+        .table-header {
+            padding: 25px 30px; display: flex; justify-content: space-between;
+            align-items: center; border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .table-header h3 { font-size: 20px; font-weight: 600; color: white; }
+        .btn {
+            padding: 12px 24px; border-radius: 10px; border: none; cursor: pointer;
+            font-size: 14px; font-weight: 600; display: inline-flex; align-items: center;
+            gap: 10px; transition: all 0.3s;
+        }
+        .btn-primary { background: var(--gradient-1); color: white; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(102,126,234,0.3); }
+        .btn-success { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; }
+        .btn-success:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(16,185,129,0.3); }
+        .btn-danger { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; }
+        .btn-danger:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(239,68,68,0.3); }
+        .btn-secondary { background: rgba(255,255,255,0.05); color: var(--text-secondary); border: 1px solid rgba(255,255,255,0.1); }
+        .btn-secondary:hover { background: rgba(255,255,255,0.1); color: white; }
+
+        table { width: 100%; border-collapse: collapse; }
+        th {
+            background: rgba(255,255,255,0.02); padding: 16px 24px; text-align: left;
+            font-size: 12px; font-weight: 600; color: var(--text-secondary);
+            text-transform: uppercase; letter-spacing: 0.5px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        td { padding: 16px 24px; border-bottom: 1px solid rgba(255,255,255,0.03); font-size: 14px; color: var(--text-primary); }
+        tr:hover { background: rgba(255,255,255,0.02); }
+        .badge {
+            padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 600;
+        }
+        .badge-active { background: rgba(52,211,153,0.15); color: var(--accent-green); }
+        .badge-inactive { background: rgba(248,113,113,0.15); color: var(--accent-red); }
+        .badge-monthly { background: rgba(96,165,250,0.15); color: var(--accent-blue); }
+        .badge-yearly { background: rgba(251,146,60,0.15); color: var(--accent-orange); }
+        .action-btns { display: flex; gap: 8px; }
+        .action-btns button { padding: 8px 14px; font-size: 12px; border-radius: 8px; border: none; cursor: pointer; }
+
+        /* Forms */
+        .form-card {
+            background: var(--bg-secondary); padding: 40px; border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.05); max-width: 700px;
+        }
+        .form-card h3 { margin-bottom: 30px; font-size: 22px; color: white; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px; }
+        .form-group { display: flex; flex-direction: column; }
+        .form-group label { margin-bottom: 10px; font-weight: 500; font-size: 14px; color: var(--text-secondary); }
+        .form-group input, .form-group select {
+            padding: 14px; background: var(--bg-primary); border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 12px; color: var(--text-primary); font-size: 14px;
+            transition: all 0.3s;
+        }
+        .form-group input:focus, .form-group select:focus { outline: none; border-color: var(--accent-purple); box-shadow: 0 0 20px rgba(192,132,252,0.1); }
+        .form-actions { display: flex; gap: 16px; margin-top: 30px; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.05); }
+
+        /* Search */
+        .search-box {
+            background: var(--bg-secondary); padding: 35px; border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.05); max-width: 650px;
+        }
+        .search-box h3 { margin-bottom: 25px; font-size: 22px; color: white; }
+        .search-tabs { display: flex; gap: 12px; margin-bottom: 25px; }
+        .search-tab {
+            padding: 12px 24px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px; cursor: pointer; font-weight: 500; color: var(--text-secondary);
+            transition: all 0.3s;
+        }
+        .search-tab.active { background: var(--gradient-1); color: white; border-color: transparent; }
+        .search-input { display: flex; gap: 12px; }
+        .search-input input {
+            flex: 1; padding: 14px; background: var(--bg-primary); border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 12px; color: var(--text-primary); font-size: 15px;
+        }
+        .search-input input:focus { outline: none; border-color: var(--accent-purple); }
+        .search-results { margin-top: 30px; }
+        .result-card {
+            background: var(--bg-primary); padding: 25px; border-radius: 12px;
+            border-left: 4px solid var(--accent-purple); margin-bottom: 16px;
+        }
+        .result-card h4 { color: var(--accent-purple); margin-bottom: 12px; font-size: 18px; }
+        .result-card p { color: var(--text-secondary); font-size: 14px; margin-bottom: 6px; }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7); display: none; justify-content: center;
+            align-items: center; z-index: 200; backdrop-filter: blur(5px);
+        }
+        .modal-overlay.active { display: flex; }
+        .modal-box {
+            background: var(--bg-secondary); padding: 40px; border-radius: 20px;
+            width: 90%; max-width: 450px; position: relative;
+            border: 1px solid rgba(255,255,255,0.1); box-shadow: var(--shadow-lg);
+        }
+        .modal-close {
+            position: absolute; top: 20px; right: 25px; font-size: 24px;
+            cursor: pointer; color: var(--text-secondary); transition: color 0.3s;
+        }
+        .modal-close:hover { color: white; }
+        .modal-box h3 { margin-bottom: 25px; font-size: 22px; color: white; }
+        .receipt-preview {
+            background: var(--bg-primary); padding: 25px; border-radius: 12px;
+            margin-top: 25px; border: 2px solid rgba(52,211,153,0.3);
+        }
+        .receipt-preview h4 { color: var(--accent-green); margin-bottom: 15px; }
+        .receipt-preview p { margin-bottom: 8px; font-size: 14px; color: var(--text-secondary); }
+
+        /* Backup */
+        .backup-card {
+            background: var(--bg-secondary); padding: 50px; border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.05); max-width: 550px; text-align: center;
+        }
+        .backup-card h3 { margin-bottom: 15px; font-size: 24px; color: white; }
+        .backup-card p { color: var(--text-secondary); margin-bottom: 35px; }
+        .backup-btns { display: flex; flex-direction: column; gap: 16px; }
+        .backup-btns .btn { justify-content: center; padding: 16px; font-size: 16px; }
+        .backup-status { margin-top: 30px; padding: 20px; border-radius: 12px; font-weight: 500; display: none; }
+        .backup-status.show { display: block; }
+        .backup-status.success { background: rgba(52,211,153,0.15); color: var(--accent-green); }
+        .backup-status.error { background: rgba(248,113,113,0.15); color: var(--accent-red); }
+
+        /* Toast */
+        .toast {
+            position: fixed; bottom: 30px; right: 30px; padding: 18px 28px;
+            border-radius: 12px; color: white; font-weight: 500; z-index: 300;
+            transform: translateX(500px); transition: transform 0.4s;
+            box-shadow: var(--shadow-lg); border: 1px solid rgba(255,255,255,0.1);
+        }
+        .toast.show { transform: translateX(0); }
+        .toast.success { background: var(--bg-secondary); border-left: 4px solid var(--accent-green); }
+        .toast.error { background: var(--bg-secondary); border-left: 4px solid var(--accent-red); }
+        .toast.info { background: var(--bg-secondary); border-left: 4px solid var(--accent-blue); }
+
+        /* Page Sections */
+        .page-section { display: none; }
+        .page-section.active { display: block; animation: fadeIn 0.4s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Empty State */
+        .empty-state { text-align: center; padding: 80px 20px; color: var(--text-secondary); }
+        .empty-state i { font-size: 56px; margin-bottom: 20px; color: var(--text-secondary); opacity: 0.5; }
+        .empty-state p { font-size: 16px; }
+
+        /* Loading */
+        .loading { text-align: center; padding: 50px; color: var(--text-secondary); }
+        .loading i { font-size: 40px; animation: spin 1s linear infinite; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar { width: 100%; position: relative; height: auto; }
+            .main-content { margin-left: 0; }
+            .dashboard { flex-direction: column; }
+            .form-row { grid-template-columns: 1fr; }
+            .stats-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+<base target="_blank">
+</head>
+<body>
+    <div id="toast" class="toast"></div>
+
+    <!-- Login Page -->
+    <div id="loginPage" class="login-container">
+        <div class="login-box">
+            <div class="login-icon"><i class="fas fa-building"></i></div>
+            <h1>FlatHub</h1>
+            <p>Flat Management System</p>
+            <input type="text" id="loginUser" class="login-input" placeholder="Username" value="admin">
+            <input type="password" id="loginPass" class="login-input" placeholder="Password" value="admin">
+            <button class="login-btn" onclick="doLogin()">Login</button>
+            <div class="login-error" id="loginError"></div>
+        </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div id="dashboard" class="dashboard">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <i class="fas fa-building"></i>
+                <h2>FlatHub</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-item active" onclick="showPage('home', this)">
+                    <i class="fas fa-chart-line"></i><span>Dashboard</span>
+                </div>
+                <div class="nav-item" onclick="showPage('tenants', this)">
+                    <i class="fas fa-users"></i><span>Tenants</span>
+                </div>
+                <div class="nav-item" onclick="showPage('addTenant', this)">
+                    <i class="fas fa-user-plus"></i><span>Add Tenant</span>
+                </div>
+                <div class="nav-item" onclick="showPage('receipts', this)">
+                    <i class="fas fa-file-invoice-dollar"></i><span>Receipts</span>
+                </div>
+                <div class="nav-item" onclick="showPage('vacant', this)">
+                    <i class="fas fa-door-open"></i><span>Vacant Flats</span>
+                </div>
+                <div class="nav-item" onclick="showPage('search', this)">
+                    <i class="fas fa-search"></i><span>Search</span>
+                </div>
+                <div class="nav-item" onclick="showPage('backup', this)">
+                    <i class="fas fa-database"></i><span>Backup</span>
+                </div>
+            </nav>
+            <div class="sidebar-footer">
+                <button class="logout-btn" onclick="doLogout()">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="top-bar">
+                <h2 id="pageTitle">Dashboard</h2>
+                <div class="user-info">
+                    <span>Admin</span>
+                    <div class="user-avatar">A</div>
+                </div>
+            </div>
+
+            <div class="content">
+                <!-- HOME / DASHBOARD -->
+                <div id="page-home" class="page-section active">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon pink"><i class="fas fa-users"></i></div>
+                            <div class="stat-info">
+                                <h3 id="statTenants">-</h3>
+                                <p>Active Tenants</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon cyan"><i class="fas fa-money-bill-wave"></i></div>
+                            <div class="stat-info">
+                                <h3 id="statRevenue">-</h3>
+                                <p>Monthly Revenue</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon green"><i class="fas fa-door-open"></i></div>
+                            <div class="stat-info">
+                                <h3 id="statVacant">-</h3>
+                                <p>Vacant Flats</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon orange"><i class="fas fa-file-invoice"></i></div>
+                            <div class="stat-info">
+                                <h3 id="statReceipts">-</h3>
+                                <p>Total Receipts</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <div class="table-header">
+                            <h3><i class="fas fa-clock" style="margin-right:10px;"></i>Recent Tenants</h3>
+                            <button class="btn btn-primary" onclick="showPage('tenants', document.querySelectorAll('.nav-item')[1])">
+                                <i class="fas fa-arrow-right"></i> View All
+                            </button>
+                        </div>
+                        <table id="recentTenantsTable">
+                            <thead>
+                                <tr><th>Name</th><th>Flat</th><th>Rent</th><th>Type</th><th>Status</th></tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- TENANTS LIST -->
+                <div id="page-tenants" class="page-section">
+                    <div class="table-container">
+                        <div class="table-header">
+                            <h3><i class="fas fa-users" style="margin-right:10px;"></i>All Tenants</h3>
+                            <button class="btn btn-primary" onclick="showPage('addTenant', document.querySelectorAll('.nav-item')[2])">
+                                <i class="fas fa-user-plus"></i> Add Tenant
+                            </button>
+                        </div>
+                        <table id="tenantsTable">
+                            <thead>
+                                <tr>
+                                    <th>Name</th><th>CNIC</th><th>Phone</th><th>Flat</th><th>Rent</th>
+                                    <th>Type</th><th>Join Date</th><th>Status</th><th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- ADD TENANT -->
+                <div id="page-addTenant" class="page-section">
+                    <div class="form-card">
+                        <h3><i class="fas fa-user-plus" style="margin-right:12px;color:var(--accent-purple);"></i>Add New Tenant</h3>
+                        <form id="tenantForm" onsubmit="return addTenant(event)">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label><i class="fas fa-user" style="margin-right:8px;"></i>Full Name *</label>
+                                    <input type="text" id="tName" required placeholder="Enter full name">
+                                </div>
+                                <div class="form-group">
+                                    <label><i class="fas fa-id-card" style="margin-right:8px;"></i>CNIC *</label>
+                                    <input type="text" id="tCnic" required placeholder="XXXXX-XXXXXXX-X" maxlength="15">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label><i class="fas fa-phone" style="margin-right:8px;"></i>Phone Number *</label>
+                                    <input type="text" id="tPhone" required placeholder="03XX-XXXXXXX">
+                                </div>
+                                <div class="form-group">
+                                    <label><i class="fas fa-door-closed" style="margin-right:8px;"></i>Flat Number *</label>
+                                    <input type="text" id="tFlat" required placeholder="e.g. A-101">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label><i class="fas fa-money-bill" style="margin-right:8px;"></i>Rent Amount (Rs.) *</label>
+                                    <input type="number" id="tRent" required placeholder="Monthly rent">
+                                </div>
+                                <div class="form-group">
+                                    <label><i class="fas fa-exclamation-circle" style="margin-right:8px;"></i>Dues (Rs.)</label>
+                                    <input type="number" id="tDues" value="0" placeholder="Enter dues">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label><i class="fas fa-calendar-alt" style="margin-right:8px;"></i>Payment Type *</label>
+                                    <select id="tType" required>
+                                        <option value="">Select Type</option>
+                                        <option value="monthly">Monthly</option>
+                                        <option value="yearly">Yearly</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label><i class="fas fa-calendar" style="margin-right:8px;"></i>Join Date</label>
+                                    <input type="date" id="tJoinDate">
+                                </div>
+                            </div>
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-plus"></i> Add Tenant
+                                </button>
+                                <button type="button" class="btn btn-secondary" onclick="showPage('tenants', document.querySelectorAll('.nav-item')[1])">
+                                    <i class="fas fa-times"></i> Cancel
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- RECEIPTS -->
+                <div id="page-receipts" class="page-section">
+                    <div class="table-container">
+                        <div class="table-header">
+                            <h3><i class="fas fa-file-invoice-dollar" style="margin-right:10px;"></i>All Receipts</h3>
+                            <button class="btn btn-primary" onclick="openReceiptModal()">
+                                <i class="fas fa-plus"></i> Generate Receipt
+                            </button>
+                        </div>
+                        <table id="receiptsTable">
+                            <thead>
+                                <tr>
+                                    <th>Receipt #</th><th>Tenant</th><th>Flat</th><th>Amount</th>
+                                    <th>Type</th><th>Date</th><th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- VACANT FLATS -->
+                <div id="page-vacant" class="page-section">
+                    <div class="table-container">
+                        <div class="table-header">
+                            <h3><i class="fas fa-door-open" style="margin-right:10px;"></i>Vacant Flats</h3>
+                        </div>
+                        <table id="vacantTable">
+                            <thead>
+                                <tr>
+                                    <th>Flat Number</th><th>Previous Tenant</th><th>CNIC</th>
+                                    <th>Vacated Date</th><th>Previous Rent</th><th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- SEARCH -->
+                <div id="page-search" class="page-section">
+                    <div class="search-box">
+                        <h3><i class="fas fa-search" style="margin-right:12px;color:var(--accent-purple);"></i>Search Tenant</h3>
+                        <div class="search-tabs">
+                            <button class="search-tab active" onclick="setSearchType('cnic', this)">By CNIC</button>
+                            <button class="search-tab" onclick="setSearchType('flat', this)">By Flat</button>
+                            <button class="search-tab" onclick="setSearchType('name', this)">By Name</button>
+                        </div>
+                        <div class="search-input">
+                            <input type="text" id="searchInput" placeholder="Enter CNIC to search...">
+                            <button class="btn btn-primary" onclick="performSearch()">
+                                <i class="fas fa-search"></i> Search
+                            </button>
+                        </div>
+                        <div class="search-results" id="searchResults"></div>
+                    </div>
+                </div>
+
+                <!-- BACKUP -->
+                <div id="page-backup" class="page-section">
+                    <div class="backup-card">
+                        <h3><i class="fas fa-database" style="margin-right:12px;color:var(--accent-purple);"></i>Data Backup</h3>
+                        <p>Backup all tenant, receipt, and vacancy records. Download as JSON file.</p>
+                        <div class="backup-btns">
+                            <button class="btn btn-primary" onclick="backupAll()">
+                                <i class="fas fa-save"></i> Backup All Data
+                            </button>
+                            <button class="btn btn-secondary" onclick="downloadBackup()">
+                                <i class="fas fa-download"></i> Download Backup
+                            </button>
+                        </div>
+                        <div class="backup-status" id="backupStatus"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Receipt Modal -->
+    <div id="receiptModal" class="modal-overlay" onclick="closeModal(event)">
+        <div class="modal-box" onclick="event.stopPropagation()">
+            <span class="modal-close" onclick="closeModal()">&times;</span>
+            <h3><i class="fas fa-file-invoice-dollar" style="margin-right:12px;color:var(--accent-green);"></i>Generate Receipt</h3>
+            <div class="form-group" style="margin-bottom: 25px;">
+                <label><i class="fas fa-door-closed" style="margin-right:8px;"></i>Enter Flat Number</label>
+                <input type="text" id="receiptFlatNo" placeholder="e.g. A-101">
+            </div>
+            <button class="btn btn-primary" onclick="generateReceipt()">
+                <i class="fas fa-plus"></i> Generate Receipt
+            </button>
+            <div id="receiptPreview"></div>
+        </div>
+    </div>
+    <script>
+        const API = "http://localhost:4567";
+
+        // ── AUTH ──────────────────────────────────────────────────────────────
+        function doLogin() {
+            const user = document.getElementById('loginUser').value;
+            const pass = document.getElementById('loginPass').value;
+            if (user === 'admin' && pass === 'admin') {
+                document.getElementById('loginPage').style.display = 'none';
+                document.getElementById('dashboard').classList.add('active');
+                loadStats();
+                loadTenants();
+            } else {
+                document.getElementById('loginError').textContent = 'Wrong username or password';
+            }
+        }
+
+        function doLogout() {
+            document.getElementById('loginPage').style.display = 'flex';
+            document.getElementById('dashboard').classList.remove('active');
+        }
+
+        // ── NAVIGATION ────────────────────────────────────────────────────────
+        function showPage(page, el) {
+            document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.getElementById('page_' + page).classList.add('active');
+            el.classList.add('active');
+            const titles = { home:'Dashboard', tenants:'Tenants', addTenant:'Add Tenant',
+                             receipts:'Receipts', vacant:'Vacant Flats', search:'Search', backup:'Backup' };
+            document.getElementById('pageTitle').textContent = titles[page] || page;
+            if (page === 'home')     loadStats();
+            if (page === 'tenants')  loadTenants();
+            if (page === 'receipts') loadReceipts();
+            if (page === 'vacant')   loadVacant();
+        }
+
+        // ── TOAST ─────────────────────────────────────────────────────────────
+        function showToast(msg, type = 'success') {
+            const t = document.getElementById('toast');
+            t.textContent = msg; t.className = `toast ${type} show`;
+            setTimeout(() => t.classList.remove('show'), 3000);
+        }
+
+        // ── STATS ─────────────────────────────────────────────────────────────
+        function loadStats() {
+            fetch(`${API}/api/stats`)
+                .then(r => r.json())
+                .then(d => {
+                    document.getElementById('statTenants').textContent  = d.totalTenants  ?? 0;
+                    document.getElementById('statVacant').textContent   = d.totalVacant   ?? 0;
+                    document.getElementById('statReceipts').textContent = d.totalReceipts ?? 0;
+                    document.getElementById('statRevenue').textContent  = 'Rs ' + (d.monthlyRevenue ?? 0);
+                })
+                .catch(() => showToast('Cannot reach server', 'error'));
+        }
+
+        // ── TENANTS ───────────────────────────────────────────────────────────
+        function loadTenants() {
+            const tbody = document.getElementById('tenantsBody');
+            tbody.innerHTML = '<tr><td colspan="8" class="loading"><i class="fas fa-spinner"></i></td></tr>';
+            fetch(`${API}/api/tenants`)
+                .then(r => r.json())
+                .then(list => {
+                    if (!list.length) {
+                        tbody.innerHTML = '<tr><td colspan="8"><div class="empty-state"><i class="fas fa-users"></i><p>No tenants yet</p></div></td></tr>';
+                        return;
+                    }
+                    tbody.innerHTML = list.map(t => `
+                        <tr>
+                            <td>${t.name}</td>
+                            <td>${t.cnic}</td>
+                            <td>${t.phone_no}</td>
+                            <td>${t.flat_no}</td>
+                            <td>Rs ${t.rent}</td>
+                            <td>Rs ${t.dues}</td>
+                            <td><span class="badge badge-${t.type === 'Monthly' ? 'monthly' : 'yearly'}">${t.type}</span></td>
+                            <td><div class="action-btns">
+                                <button class="btn btn-danger" onclick="removeTenant('${t.flat_no}')">Remove</button>
+                                <button class="btn btn-success" onclick="openReceiptModal('${t.flat_no}')">Receipt</button>
+                            </div></td>
+                        </tr>`).join('');
+                })
+                .catch(() => showToast('Cannot reach server', 'error'));
+        }
+
+        function addTenant() {
+            const t = {
+                name:     document.getElementById('tName').value.trim(),
+                cnic:     document.getElementById('tCnic').value.trim(),
+                phone_no: document.getElementById('tPhone').value.trim(),
+                flat_no:  document.getElementById('tFlat').value.trim(),
+                rent:     parseFloat(document.getElementById('tRent').value),
+                dues:     parseFloat(document.getElementById('tDues').value) || 0,
+                type:     document.getElementById('tType').value,
+                joinDate: document.getElementById('tJoin').value
+            };
+            if (!t.name || !t.cnic || !t.flat_no || !t.rent) {
+                showToast('Fill all required fields', 'error'); return;
+            }
+            fetch(`${API}/api/tenants`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(t)
+            })
+            .then(r => r.json())
+            .then(d => {
+                if (d.error) { showToast(d.error, 'error'); return; }
+                showToast('Tenant added successfully!');
+                document.querySelectorAll('#addTenantForm input, #addTenantForm select').forEach(i => i.value = '');
+            })
+            .catch(() => showToast('Cannot reach server', 'error'));
+        }
+
+        function removeTenant(flat) {
+            if (!confirm(`Remove tenant in flat ${flat}?`)) return;
+            fetch(`${API}/api/tenants/${flat}`, { method: 'DELETE' })
+                .then(r => r.json())
+                .then(() => { showToast('Tenant removed'); loadTenants(); loadStats(); })
+                .catch(() => showToast('Cannot reach server', 'error'));
+        }
+
+        // ── RECEIPTS ──────────────────────────────────────────────────────────
+        function openReceiptModal(flat) {
+            document.getElementById('receiptFlat').value = flat;
+            document.getElementById('receiptModal').classList.add('active');
+        }
+
+        function generateReceipt() {
+            const flat = document.getElementById('receiptFlat').value;
+            fetch(`${API}/api/receipts?flat_no=${flat}`, { method: 'POST' })
+                .then(r => r.json())
+                .then(d => {
+                    if (d.error) { showToast(d.error, 'error'); return; }
+                    showToast('Receipt generated!');
+                    document.getElementById('receiptModal').classList.remove('active');
+                    loadReceipts();
+                })
+                .catch(() => showToast('Cannot reach server', 'error'));
+        }
+
+        function loadReceipts() {
+            const tbody = document.getElementById('receiptsBody');
+            tbody.innerHTML = '<tr><td colspan="6" class="loading"><i class="fas fa-spinner"></i></td></tr>';
+            fetch(`${API}/api/receipts`)
+                .then(r => r.json())
+                .then(list => {
+                    if (!list.length) {
+                        tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><i class="fas fa-receipt"></i><p>No receipts yet</p></div></td></tr>';
+                        return;
+                    }
+                    tbody.innerHTML = list.map(r => `
+                        <tr>
+                            <td>${r.recieptNo}</td>
+                            <td>${r.tenantName}</td>
+                            <td>${r.flatNo}</td>
+                            <td>Rs ${r.amount}</td>
+                            <td>${r.paymentType}</td>
+                            <td>${r.date}</td>
+                        </tr>`).join('');
+                })
+                .catch(() => showToast('Cannot reach server', 'error'));
+        }
+
+        // ── VACANT ────────────────────────────────────────────────────────────
+        function loadVacant() {
+            const tbody = document.getElementById('vacantBody');
+            tbody.innerHTML = '<tr><td colspan="4" class="loading"><i class="fas fa-spinner"></i></td></tr>';
+            fetch(`${API}/api/vacancies`)
+                .then(r => r.json())
+                .then(list => {
+                    if (!list.length) {
+                        tbody.innerHTML = '<tr><td colspan="4"><div class="empty-state"><i class="fas fa-door-open"></i><p>No vacant flats</p></div></td></tr>';
+                        return;
+                    }
+                    tbody.innerHTML = list.map(v => `
+                        <tr>
+                            <td>${v[0]}</td><td>${v[1]}</td><td>${v[2]}</td><td>${v[3]}</td>
+                        </tr>`).join('');
+                })
+                .catch(() => showToast('Cannot reach server', 'error'));
+        }
+
+        // ── SEARCH ────────────────────────────────────────────────────────────
+        let searchType = 'cnic';
+        function setSearchTab(type, el) {
+            searchType = type;
+            document.querySelectorAll('.search-tab').forEach(t => t.classList.remove('active'));
+            el.classList.add('active');
+            document.getElementById('searchInput').placeholder =
+                type === 'cnic' ? 'Enter CNIC' : type === 'flat' ? 'Enter Flat No' : 'Enter Name';
+        }
+
+        function doSearch() {
+            const val = document.getElementById('searchInput').value.trim();
+            if (!val) return;
+            fetch(`${API}/api/tenants/search/${searchType}?${searchType}=${encodeURIComponent(val)}`)
+                .then(r => r.json())
+                .then(list => {
+                    const div = document.getElementById('searchResults');
+                    if (!list.length) { div.innerHTML = '<p style="color:var(--text-secondary)">No results found</p>'; return; }
+                    div.innerHTML = list.map(t => `
+                        <div class="result-card">
+                            <h4>${t.name}</h4>
+                            <p><b>CNIC:</b> ${t.cnic} &nbsp; <b>Phone:</b> ${t.phone_no}</p>
+                            <p><b>Flat:</b> ${t.flat_no} &nbsp; <b>Rent:</b> Rs ${t.rent} &nbsp; <b>Dues:</b> Rs ${t.dues}</p>
+                            <p><b>Type:</b> ${t.type} &nbsp; <b>Joined:</b> ${t.joinDate}</p>
+                        </div>`).join('');
+                })
+                .catch(() => showToast('Cannot reach server', 'error'));
+        }
+
+        // ── BACKUP ────────────────────────────────────────────────────────────
+        function doBackup() {
+            fetch(`${API}/api/backup`, { method: 'POST' })
+                .then(r => r.json())
+                .then(() => {
+                    const s = document.getElementById('backupStatus');
+                    s.textContent = 'Backup completed successfully!';
+                    s.className = 'backup-status show success';
+                })
+                .catch(() => {
+                    const s = document.getElementById('backupStatus');
+                    s.textContent = 'Backup failed. Is the server running?';
+                    s.className = 'backup-status show error';
+                });
+        }
+    </script>
+<!--    <script>-->
+<!--        // ==================== API CONFIG ====================-->
+<!--        const API_URL = 'http://localhost:4567/api';-->
+
+<!--        let currentUser = JSON.parse(localStorage.getItem('flathub_user')) || null;-->
+<!--        let searchType = 'cnic';-->
+
+<!--        if (currentUser) showDashboard();-->
+
+<!--        // ==================== AUTH ====================-->
+<!--        function doLogin() {-->
+<!--            const user = document.getElementById('loginUser').value;-->
+<!--            const pass = document.getElementById('loginPass').value;-->
+<!--            if (user === 'admin' && pass === 'admin') {-->
+<!--                currentUser = { username: 'admin', name: 'Admin' };-->
+<!--                localStorage.setItem('flathub_user', JSON.stringify(currentUser));-->
+<!--                showDashboard();-->
+<!--                showToast('Login successful!', 'success');-->
+<!--            } else {-->
+<!--                document.getElementById('loginError').textContent = 'Invalid username or password!';-->
+<!--            }-->
+<!--        }-->
+
+<!--        function doLogout() {-->
+<!--            currentUser = null;-->
+<!--            localStorage.removeItem('flathub_user');-->
+<!--            document.getElementById('loginPage').style.display = 'flex';-->
+<!--            document.getElementById('dashboard').classList.remove('active');-->
+<!--            showToast('Logged out', 'info');-->
+<!--        }-->
+
+<!--        function showDashboard() {-->
+<!--            document.getElementById('loginPage').style.display = 'none';-->
+<!--            document.getElementById('dashboard').classList.add('active');-->
+<!--            loadDashboard();-->
+<!--        }-->
+
+<!--        // ==================== NAVIGATION ====================-->
+<!--        function showPage(page, navItem) {-->
+<!--            document.querySelectorAll('.page-section').forEach(p => p.classList.remove('active'));-->
+<!--            document.getElementById('page-' + page).classList.add('active');-->
+<!--            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));-->
+<!--            if (navItem) navItem.classList.add('active');-->
+
+<!--            const titles = { -->
+<!--                home: 'Dashboard', tenants: 'All Tenants', addTenant: 'Add New Tenant', -->
+<!--                receipts: 'Receipts', vacant: 'Vacant Flats', search: 'Search Tenant', backup: 'Data Backup' -->
+<!--            };-->
+<!--            document.getElementById('pageTitle').textContent = titles[page];-->
+
+<!--            if (page === 'tenants') loadTenants();-->
+<!--            if (page === 'receipts') loadReceipts();-->
+<!--            if (page === 'vacant') loadVacancies();-->
+<!--            if (page === 'home') loadDashboard();-->
+<!--        }-->
+
+<!--        // ==================== API CALLS ====================-->
+<!--        async function apiGet(endpoint) {-->
+<!--            try {-->
+<!--                const res = await fetch(API_URL + endpoint);-->
+<!--                if (!res.ok) throw new Error('API Error');-->
+<!--                return await res.json();-->
+<!--            } catch (e) {-->
+<!--                showToast('Backend not connected! Using demo mode.', 'error');-->
+<!--                return null;-->
+<!--            }-->
+<!--        }-->
+
+<!--        async function apiPost(endpoint, body) {-->
+<!--            try {-->
+<!--                const res = await fetch(API_URL + endpoint, {-->
+<!--                    method: 'POST',-->
+<!--                    headers: { 'Content-Type': 'application/json' },-->
+<!--                    body: JSON.stringify(body)-->
+<!--                });-->
+<!--                return await res.json();-->
+<!--            } catch (e) {-->
+<!--                showToast('Backend not connected!', 'error');-->
+<!--                return null;-->
+<!--            }-->
+<!--        }-->
+
+<!--        async function apiDelete(endpoint) {-->
+<!--            try {-->
+<!--                const res = await fetch(API_URL + endpoint, { method: 'DELETE' });-->
+<!--                return await res.json();-->
+<!--            } catch (e) {-->
+<!--                showToast('Backend not connected!', 'error');-->
+<!--                return null;-->
+<!--            }-->
+<!--        }-->
+
+<!--        // ==================== DASHBOARD ====================-->
+<!--        async function loadDashboard() {-->
+<!--            const stats = await apiGet('/stats');-->
+<!--            if (stats) {-->
+<!--                document.getElementById('statTenants').textContent = stats.totalTenants;-->
+<!--                document.getElementById('statRevenue').textContent = 'Rs. ' + stats.monthlyRevenue.toLocaleString();-->
+<!--                document.getElementById('statVacant').textContent = stats.totalVacant;-->
+<!--                document.getElementById('statReceipts').textContent = stats.totalReceipts;-->
+<!--            }-->
+
+<!--            const tenants = await apiGet('/tenants');-->
+<!--            if (tenants) {-->
+<!--                const tbody = document.querySelector('#recentTenantsTable tbody');-->
+<!--                tbody.innerHTML = '';-->
+<!--                const active = tenants.filter(t => t.active).slice(-5).reverse();-->
+<!--                active.forEach(t => {-->
+<!--                    tbody.innerHTML += `<tr><td>${t.name}</td><td>${t.flat_no}</td><td>Rs. ${parseFloat(t.rent).toLocaleString()}</td><td><span class="badge badge-${t.type}">${t.type}</span></td><td><span class="badge badge-active">Active</span></td></tr>`;-->
+<!--                });-->
+<!--            }-->
+<!--        }-->
+
+<!--        // ==================== TENANTS ====================-->
+<!--        async function loadTenants() {-->
+<!--            const tenants = await apiGet('/tenants');-->
+<!--            const tbody = document.querySelector('#tenantsTable tbody');-->
+<!--            tbody.innerHTML = '';-->
+<!--            if (!tenants || tenants.length === 0) {-->
+<!--                tbody.innerHTML = '<tr><td colspan="9"><div class="empty-state"><i class="fas fa-users"></i><p>No tenants found</p></div></td></tr>';-->
+<!--                return;-->
+<!--            }-->
+<!--            tenants.forEach((t, i) => {-->
+<!--                const status = t.active ? '<span class="badge badge-active">Active</span>' : '<span class="badge badge-inactive">Left</span>';-->
+<!--                const actions = t.active ? `<div class="action-btns"><button class="btn-danger" onclick="removeTenant('${t.flat_no}')">Remove</button></div>` : '-';-->
+<!--                tbody.innerHTML += `<tr><td>${t.name}</td><td>${t.cnic}</td><td>${t.phone_no}</td><td>${t.flat_no}</td><td>Rs. ${parseFloat(t.rent).toLocaleString()}</td><td><span class="badge badge-${t.type}">${t.type}</span></td><td>${t.joinDate}</td><td>${status}</td><td>${actions}</td></tr>`;-->
+<!--            });-->
+<!--        }-->
+
+<!--        async function addTenant(e) {-->
+<!--            e.preventDefault();-->
+<!--            const tenant = {-->
+<!--                name: document.getElementById('tName').value,-->
+<!--                cnic: document.getElementById('tCnic').value,-->
+<!--                phone_no: document.getElementById('tPhone').value,-->
+<!--                flat_no: document.getElementById('tFlat').value,-->
+<!--                rent: parseFloat(document.getElementById('tRent').value),-->
+<!--                dues: parseFloat(document.getElementById('tDues').value) || 0,-->
+<!--                type: document.getElementById('tType').value,-->
+<!--                joinDate: document.getElementById('tJoinDate').value || new Date().toISOString().split('T')[0],-->
+<!--                active: true-->
+<!--            };-->
+
+<!--            const result = await apiPost('/tenants', tenant);-->
+<!--            if (result) {-->
+<!--                showToast(result.message || 'Tenant added!', 'success');-->
+<!--                document.getElementById('tenantForm').reset();-->
+<!--                showPage('tenants', document.querySelectorAll('.nav-item')[1]);-->
+<!--            }-->
+<!--            return false;-->
+<!--        }-->
+
+<!--        async function removeTenant(flat) {-->
+<!--            if (!confirm('Remove this tenant?')) return;-->
+<!--            const result = await apiDelete('/tenants/' + flat);-->
+<!--            if (result) {-->
+<!--                showToast(result.message || 'Tenant removed!', 'info');-->
+<!--                loadTenants();-->
+<!--                loadDashboard();-->
+<!--            }-->
+<!--        }-->
+
+<!--        // ==================== RECEIPTS ====================-->
+<!--        async function loadReceipts() {-->
+<!--            const receipts = await apiGet('/receipts');-->
+<!--            const tbody = document.querySelector('#receiptsTable tbody');-->
+<!--            tbody.innerHTML = '';-->
+<!--            if (!receipts || receipts.length === 0) {-->
+<!--                tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><i class="fas fa-file-invoice"></i><p>No receipts found</p></div></td></tr>';-->
+<!--                return;-->
+<!--            }-->
+<!--            receipts.forEach((r, i) => {-->
+<!--                const amount = r.type === 'yearly' ? r.amount * 12 : r.amount;-->
+<!--                tbody.innerHTML += `<tr><td>#${r.recieptNo}</td><td>${r.tenantName}</td><td>${r.flatNo}</td><td>Rs. ${amount.toLocaleString()}</td><td><span class="badge badge-${r.type}">${r.type}</span></td><td>${r.date}</td><td><button class="btn btn-primary" style="padding:6px 12px;font-size:12px;" onclick="printReceipt(${i})"><i class="fas fa-print"></i> Print</button></td></tr>`;-->
+<!--            });-->
+<!--        }-->
+
+<!--        function openReceiptModal() {-->
+<!--            document.getElementById('receiptModal').classList.add('active');-->
+<!--            document.getElementById('receiptPreview').innerHTML = '';-->
+<!--            document.getElementById('receiptFlatNo').value = '';-->
+<!--        }-->
+
+<!--        function closeModal(e) {-->
+<!--            if (!e || e.target === document.getElementById('receiptModal')) {-->
+<!--                document.getElementById('receiptModal').classList.remove('active');-->
+<!--            }-->
+<!--        }-->
+
+<!--        async function generateReceipt() {-->
+<!--            const flatNo = document.getElementById('receiptFlatNo').value;-->
+<!--            try {-->
+<!--                const res = await fetch(API_URL + '/receipts?flat_no=' + flatNo, { method: 'POST' });-->
+<!--                const result = await res.json();-->
+<!--                if (result.success) {-->
+<!--                    document.getElementById('receiptPreview').innerHTML = '<div class="receipt-preview"><h4><i class="fas fa-check-circle" style="margin-right:8px;"></i>Receipt Generated!</h4><p>Flat: ' + flatNo + '</p></div>';-->
+<!--                    loadReceipts();-->
+<!--                    loadDashboard();-->
+<!--                    showToast('Receipt generated!', 'success');-->
+<!--                } else {-->
+<!--                    document.getElementById('receiptPreview').innerHTML = '<p style="color:var(&#45;&#45;accent-red);margin-top:15px;">' + (result.error || 'Error') + '</p>';-->
+<!--                }-->
+<!--            } catch (e) {-->
+<!--                showToast('Backend not connected!', 'error');-->
+<!--            }-->
+<!--        }-->
+
+<!--        function printReceipt(index) {-->
+<!--            // Print logic-->
+<!--        }-->
+
+<!--        // ==================== VACANCIES ====================-->
+<!--        async function loadVacancies() {-->
+<!--            const vacancies = await apiGet('/vacancies');-->
+<!--            const tbody = document.querySelector('#vacantTable tbody');-->
+<!--            tbody.innerHTML = '';-->
+<!--            if (!vacancies || vacancies.length === 0) {-->
+<!--                tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><i class="fas fa-door-open"></i><p>No vacant flats</p></div></td></tr>';-->
+<!--                return;-->
+<!--            }-->
+<!--            vacancies.forEach((v, i) => {-->
+<!--                tbody.innerHTML += `<tr><td>${v[0]}</td><td>${v[1]}</td><td>${v[2]}</td><td>${v[3]}</td><td>Rs. ${parseFloat(v[4] || 0).toLocaleString()}</td><td><button class="btn btn-success" style="padding:6px 12px;font-size:12px;" onclick="occupyFlat('${v[0]}')"><i class="fas fa-user-plus"></i> Occupy</button></td></tr>`;-->
+<!--            });-->
+<!--        }-->
+
+<!--        function occupyFlat(flatNo) {-->
+<!--            document.getElementById('tFlat').value = flatNo;-->
+<!--            showPage('addTenant', document.querySelectorAll('.nav-item')[2]);-->
+<!--        }-->
+
+<!--        // ==================== SEARCH ====================-->
+<!--        function setSearchType(type, btn) {-->
+<!--            searchType = type;-->
+<!--            document.querySelectorAll('.search-tab').forEach(t => t.classList.remove('active'));-->
+<!--            btn.classList.add('active');-->
+<!--            const placeholders = { cnic: 'Enter CNIC to search...', flat: 'Enter flat number...', name: 'Enter name to search...' };-->
+<!--            document.getElementById('searchInput').placeholder = placeholders[type];-->
+<!--        }-->
+
+<!--        async function performSearch() {-->
+<!--            const query = document.getElementById('searchInput').value.trim();-->
+<!--            const results = document.getElementById('searchResults');-->
+<!--            results.innerHTML = '';-->
+<!--            if (!query) { results.innerHTML = '<p style="color:var(&#45;&#45;text-secondary);">Enter a search term</p>'; return; }-->
+
+<!--            const endpoint = `/tenants/search/${searchType}?${searchType}=${encodeURIComponent(query)}`;-->
+<!--            const found = await apiGet(endpoint);-->
+
+<!--            if (!found || found.length === 0) { results.innerHTML = '<p style="color:var(&#45;&#45;accent-red);">No tenants found</p>'; return; }-->
+
+<!--            found.forEach(t => {-->
+<!--                const status = t.active ? '<span class="badge badge-active">Active</span>' : '<span class="badge badge-inactive">Left</span>';-->
+<!--                results.innerHTML += `<div class="result-card"><h4><i class="fas fa-user" style="margin-right:8px;"></i>${t.name}</h4><p><strong>CNIC:</strong> ${t.cnic}</p><p><strong>Flat:</strong> ${t.flat_no}</p><p><strong>Phone:</strong> ${t.phone_no}</p><p><strong>Rent:</strong> Rs. ${parseFloat(t.rent).toLocaleString()} (${t.type})</p><p><strong>Status:</strong> ${status}</p></div>`;-->
+<!--            });-->
+<!--        }-->
+
+<!--        // ==================== BACKUP ====================-->
+<!--        async function backupAll() {-->
+<!--            const status = document.getElementById('backupStatus');-->
+<!--            const result = await apiPost('/backup', {});-->
+<!--            if (result) {-->
+<!--                status.className = 'backup-status show success';-->
+<!--                status.innerHTML = '<i class="fas fa-check-circle" style="margin-right:8px;"></i><strong>Backup Successful!</strong>';-->
+<!--                showToast('Backup completed!', 'success');-->
+<!--            }-->
+<!--        }-->
+
+<!--        async function downloadBackup() {-->
+<!--            try {-->
+<!--                const res = await fetch(API_URL + '/backup');-->
+<!--                const data = await res.json();-->
+<!--                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });-->
+<!--                const url = URL.createObjectURL(blob);-->
+<!--                const a = document.createElement('a');-->
+<!--                a.href = url;-->
+<!--                a.download = `flathub_backup_${new Date().toISOString().split('T')[0]}.json`;-->
+<!--                a.click();-->
+<!--                URL.revokeObjectURL(url);-->
+<!--                showToast('Backup downloaded!', 'success');-->
+<!--            } catch (e) {-->
+<!--                showToast('Backend not connected!', 'error');-->
+<!--            }-->
+<!--        }-->
+
+<!--        // ==================== UTILITIES ====================-->
+<!--        function showToast(msg, type) {-->
+<!--            const toast = document.getElementById('toast');-->
+<!--            toast.textContent = msg;-->
+<!--            toast.className = 'toast ' + type;-->
+<!--            setTimeout(() => toast.classList.add('show'), 10);-->
+<!--            setTimeout(() => toast.classList.remove('show'), 3000);-->
+<!--        }-->
+
+<!--        document.getElementById('tJoinDate').value = new Date().toISOString().split('T')[0];-->
+<!--    </script>-->
+</body>
+</html>

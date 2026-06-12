@@ -1,5 +1,4 @@
 package Database;
-
 import Model.*;
 import java.sql.*;
 import java.sql.Connection;
@@ -7,34 +6,38 @@ import java.util.ArrayList;
 class connection {
     private static Connection con = null;
 
-    public static connection getConnection()
+    public connection() {
+    }
+
+    public static Connection getConnection()
     {
         if (con==null) {
             try {
-                con =DriverManager.getConnection("jdbc:mysql://localhost:3306/flathub", "root", "Orpington<3");
+                con =DriverManager.getConnection("jdbc:mysql://localhost:3306/flathub", "root", "1234");
                 System.out.println("database is working...");
             } catch (SQLException e) {
                 System.out.println("error check database.java");
             }
         }
-        return (connection) con;
+        return con;
     }
+
 }
 
 public class Database {
-    static Connection con = (Connection) connection.getConnection();
+    static Connection con=connection.getConnection();
 
-    static ArrayList<Tenant> Tenants_list = new ArrayList<>();
-    static ArrayList<RECIEPT> Reciept_list = new ArrayList<>();
-    static ArrayList<String[]> Vacant_list = new ArrayList<>();
+    public static ArrayList<Tenant> Tenants_list = new ArrayList<>();
+    public static ArrayList<RECIEPT> Reciept_list = new ArrayList<>();
+    public static ArrayList<String[]> Vacant_list = new ArrayList<>();
 
-    void load_all() throws SQLException {
+    public void load_all()  {
         load_tenants();
         load_reciepts();
         load_vacancies();
     }
 
-    void load_tenants() {
+  public   void load_tenants() {
         Tenants_list.clear();
         try {
             Statement stat = con.createStatement();
@@ -59,7 +62,7 @@ public class Database {
         }
     }
 
-    void load_reciepts() {
+   public void load_reciepts() {
         Database.Reciept_list.clear();
         try {
             Statement stat = con.createStatement();
@@ -81,7 +84,7 @@ public class Database {
         }
     }
 
-    void load_vacancies() {
+   public void load_vacancies() {
         Vacant_list.clear();
         try {
             Statement st = con.createStatement();
@@ -101,7 +104,7 @@ public class Database {
         }
     }
 
-    void add_tenant(Tenant T) {
+    public void add_tenant(Tenant T) {
         for (int i = 0; i < Tenants_list.size(); i++) {
             if (Tenants_list.get(i).getFlat_no().equals(T.getFlat_no())) {
                 System.out.println("This flat is already occupied!!");
@@ -124,7 +127,7 @@ public class Database {
             ps.executeUpdate();
             ps.close();
             Tenants_list.add(T);
-            // Agar vacant tha to hatao
+
             for (int i = 0; i < Vacant_list.size(); i++) {
                 if (Vacant_list.get(i)[0].equals(T.getFlat_no())) {
                     Vacant_list.remove(i);
@@ -138,7 +141,7 @@ public class Database {
         }
     }
 
-    void show_all_tenants() {
+   public void show_all_tenants() {
         if (Tenants_list.isEmpty()) {
             System.out.println("No tenants found!!\n");
             return;
@@ -149,8 +152,18 @@ public class Database {
         }
         System.out.println("==================\n");
     }
+   public void search_by_cnic(String cnic) {
+        for (int i = 0; i < Tenants_list.size(); i++) {
+            if (Tenants_list.get(i).getCnic().equals(cnic)) {
+                System.out.println("Tenant Found!!");
+                System.out.println(Tenants_list.get(i));
+                return;
+            }
+        }
+        System.out.println("No tenant found with CNIC:"+cnic);
+    }
 
-    void search_by_flat(String flat_no) {
+   public void search_by_flat(String flat_no) {
         for (int i = 0; i < Tenants_list.size(); i++) {
             if (Tenants_list.get(i).getFlat_no().equals(flat_no)) {
                 System.out.println("Tenant Found!!");
@@ -161,7 +174,7 @@ public class Database {
         System.out.println("No tenant found in flat: " + flat_no);
     }
 
-    void search_by_name(String name) {
+   public void search_by_name(String name) {
         for (int i = 0; i < Tenants_list.size(); i++) {
             if (Tenants_list.get(i).getName().equalsIgnoreCase(name)) {
                 System.out.println("Tenant Found!!");
@@ -172,7 +185,7 @@ public class Database {
         System.out.println("No tenant found with name: " + name);
     }
 
-    void remove_tenant(String flat_no) {
+   public void remove_tenant(String flat_no) {
         Tenant nikalo = null;
         for (int i = 0; i < Tenants_list.size(); i++) {
             if (Tenants_list.get(i).getFlat_no().equals(flat_no)) {
@@ -199,12 +212,9 @@ public class Database {
         }
     }
 
-// -----------------------------------------------
-// RECIEPT
-// -----------------------------------------------
+// ------------------------------------------------------------------------
 
-    void add_reciept(RECIEPT r) {
-        // Duplicate check
+    public void add_reciept(RECIEPT r) {
         for (int i = 0; i < Reciept_list.size(); i++) {
             if (Reciept_list.get(i).getRecieptNo() == r.getRecieptNo()) {
                 System.out.println("Duplicate Reciept!!");
@@ -230,7 +240,7 @@ public class Database {
         }
     }
 
-    void show_reciepts() {
+   public void show_reciepts() {
         if (Reciept_list.isEmpty()) {
             System.out.println("No reciepts found.");
             return;
@@ -242,7 +252,7 @@ public class Database {
         System.out.println("==================\n");
     }
 
-    void pay_rent(String flat_no) {
+   public void pay_rent(String flat_no) {
         Tenant found = null;
         for (int i = 0; i < Tenants_list.size(); i++) {
             if (Tenants_list.get(i).getFlat_no().equals(flat_no)) {
@@ -254,6 +264,7 @@ public class Database {
             System.out.println("No tenant found in flat: "+flat_no);
             return;
         }
+
         String today = java.time.LocalDate.now().toString();
         int nextNo = Reciept_list.isEmpty() ? 1 :
                 Reciept_list.get(Reciept_list.size() - 1).getRecieptNo() + 1;
@@ -280,7 +291,7 @@ public class Database {
 
 
 
-    void add_vacancy(String flat_no, String prev_tenant, String cnic) {
+    public void add_vacancy(String flat_no, String prev_tenant, String cnic) {
         try {
             PreparedStatement ps = con.prepareStatement(
                     "INSERT INTO vacancies VALUES (?,?,?,?)"
@@ -299,8 +310,7 @@ public class Database {
             System.out.println("Error while adding vacancy");
         }
     }
-
-    void delete_vacancy(String flat_no) {
+   public void delete_vacancy(String flat_no) {
         try {
             PreparedStatement ps = con.prepareStatement(
                     "DELETE FROM vacancies WHERE flat_no=?"
@@ -308,13 +318,21 @@ public class Database {
             ps.setString(1, flat_no);
             ps.executeUpdate();
             ps.close();
+
+            for (int i = 0; i < Vacant_list.size(); i++) {
+                if (Vacant_list.get(i)[0].equals(flat_no)) {
+                    Vacant_list.remove(i);
+                    break;
+                }
+            }
             System.out.println("Flat " + flat_no + " removed from vacant list.");
         } catch (SQLException e) {
             System.out.println("Error while deleting vacancy");
         }
     }
 
-    void show_vacancies() {
+
+   public void show_vacancies() {
         if (Vacant_list.isEmpty()) {
             System.out.println("No vacant flats.");
             return;
@@ -328,11 +346,11 @@ public class Database {
         System.out.println("==================\n");
     }
 
-// -----------------------------------------------
-// LANDLORD
-// -----------------------------------------------
 
-    void insert_landlord(String username, String password) {
+
+
+
+    public void insert_landlord(String username, String password) {
         try {
             PreparedStatement ps = con.prepareStatement(
                     "INSERT INTO landlord VALUES (?,?)"
